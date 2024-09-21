@@ -73,12 +73,57 @@ exports.update = async (req, res) => {
         );
     }
 };
-exports.delete = (req, res) => {
-    res.send({ message: 'delete handler' });
+exports.delete = async (req, res) => {
+    try {
+        const contactService = new ContactService(MongoDB.client);
+        const document = await contactService.delete(req.params.id);
+        if (!document) {
+            return next(new ApiError(404, 'Contact not found'));
+        }
+
+        return res.send({ message: 'Contact was deleted successfully' });
+    } catch (error) {
+        return next(
+            new ApiError(
+                500,
+                `
+                    Could not delete contact with id=${req.params.id}
+                `,
+            ),
+        );
+    }
 };
-exports.deleteAll = (req, res) => {
-    res.send({ message: 'deleteAll handler' });
+exports.deleteAll = async (req, res) => {
+    try {
+        const contactService = new ContactService(MongoDB.client);
+        const deletedCount = await contactService.deleteAll();
+
+        return res.send({ message: `${deletedCount} contact was deleted successfully` });
+    } catch (error) {
+        return next(
+            new ApiError(
+                500,
+                `
+                    An error occurred while removing all contacts 
+                `,
+            ),
+        );
+    }
 };
-exports.findAllFavorite = (req, res) => {
-    res.send({ message: 'findAllFavorite handler' });
+exports.findAllFavorite = async (req, res) => {
+    try {
+        const contactService = new ContactService(MongoDB.client);
+        const documents = await contactService.deleteAll();
+
+        return res.send(documents);
+    } catch (error) {
+        return next(
+            new ApiError(
+                500,
+                `
+                    An error occurred while retrieving favorite contacts 
+                `,
+            ),
+        );
+    }
 };

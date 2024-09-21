@@ -46,6 +46,19 @@ class ContactService {
         const result = await this.Contact.findOneAndUpdate(filter, { $set: update }, { returnDocument: 'after' });
         return result.value;
     }
+    async delete(id) {
+        const result = await this.Contact.findOneAndDelete({
+            _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+        });
+        return result;
+    }
+    async deleteAll() {
+        const result = await this.Contact.deleteMany({});
+        return result.deletedCount;
+    }
+    async findFavorite() {
+        return await this.find({ favorite: true });
+    }
 }
 
 module.exports = ContactService;
