@@ -12,7 +12,7 @@ class ContactService {
             phone: payload.phone,
             favorite: payload.favorite,
         };
-        Object.keys(contact).forEach((key) => (contact[key] = undefined && delete contact[key]));
+        Object.keys(contact).forEach((key) => contact[key] === undefined && delete contact[key]);
         return contact;
     }
     async create(payload) {

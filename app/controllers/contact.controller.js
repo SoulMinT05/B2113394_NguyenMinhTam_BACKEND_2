@@ -2,8 +2,8 @@ const ApiError = require('../api-error');
 const ContactService = require('../services/contact.service');
 const MongoDB = require('../utils/mongodb.util');
 
-exports.create = async (req, res) => {
-    if (!req.body?.name) {
+exports.create = async (req, res, next) => {
+    if (!req.body.name) {
         return next(new ApiError(400, 'Name can not be empty'));
     }
     try {
@@ -14,7 +14,7 @@ exports.create = async (req, res) => {
         return next(new ApiError(500, 'An error occurred while creating the contact'));
     }
 };
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
     let documents = [];
     try {
         const contactService = new ContactService(MongoDB.client);
@@ -30,7 +30,7 @@ exports.findAll = async (req, res) => {
     }
     return res.send(documents);
 };
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
         const document = await contactService.findById(req.params.id);
@@ -50,13 +50,14 @@ exports.findOne = async (req, res) => {
         );
     }
 };
-exports.update = async (req, res) => {
-    if (Objects.keys(req.body).length === 0) {
+exports.update = async (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
         return next(new ApiError(404, 'Data to update can not be empty'));
     }
     try {
         const contactService = new ContactService(MongoDB.client);
         const document = await contactService.update(req.params.id, req.body);
+        console.log('document: ', document);
         if (!document) {
             return next(new ApiError(404, 'Contact not found'));
         }
@@ -73,7 +74,7 @@ exports.update = async (req, res) => {
         );
     }
 };
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
         const document = await contactService.delete(req.params.id);
@@ -93,7 +94,7 @@ exports.delete = async (req, res) => {
         );
     }
 };
-exports.deleteAll = async (req, res) => {
+exports.deleteAll = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
         const deletedCount = await contactService.deleteAll();
@@ -110,11 +111,10 @@ exports.deleteAll = async (req, res) => {
         );
     }
 };
-exports.findAllFavorite = async (req, res) => {
+exports.findAllFavorite = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
-        const documents = await contactService.deleteAll();
-
+        const documents = await contactService.findFavorite();
         return res.send(documents);
     } catch (error) {
         return next(

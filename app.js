@@ -10,6 +10,7 @@ dotenv.config();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/contacts', contactRouter);
 
 app.use((req, res, next) => {
