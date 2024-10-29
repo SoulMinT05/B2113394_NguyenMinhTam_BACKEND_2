@@ -54,9 +54,18 @@ exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(404, 'Data to update can not be empty'));
     }
+    const { id } = req.params;
+    console.log('id: ', id);
     try {
         const contactService = new ContactService(MongoDB.client);
-        const document = await contactService.update(req.params.id, req.body);
+        const existingContact = await contactService.findById(id);
+        console.log('existingContact: ', existingContact);
+        if (!existingContact) {
+            return next(new ApiError(404, 'Contact not found'));
+        }
+        console.log('req.body', req.body);
+
+        const document = await contactService.update(id, req.body);
         console.log('document: ', document);
         if (!document) {
             return next(new ApiError(404, 'Contact not found'));
@@ -64,12 +73,13 @@ exports.update = async (req, res, next) => {
 
         return res.send({ message: 'Contact was updated successfully' });
     } catch (error) {
+        console.log('error: ', error);
         return next(
             new ApiError(
                 500,
                 `
-    Error updating contact with id=${req.params.id}
-    `,
+                Error updating contact with id=${req.params.id}
+                `,
             ),
         );
     }
